@@ -1,10 +1,10 @@
 package br.com.docapi.models;
 
 import br.com.docapi.entity.ColaboradorEntity;
-import  br.com.docapi.dao.ColaboradorDAO;
-import br.com.docapi.database.ConnectionFactory;
+        import  br.com.docapi.dao.ColaboradorDAO;
+        import br.com.docapi.database.ConnectionFactory;
 
-import org.springframework.stereotype.Component;
+        import org.springframework.stereotype.Component;
 
 
 @Component
