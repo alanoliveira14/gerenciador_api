@@ -11,14 +11,14 @@ public class TesteModel {
 
     public TesteEntity  teste(){
 
-        String retorno = dao.listar();
+        //String retorno = dao.listar();
 
-        String splited[] = retorno.split("-");
+        //String splited[] = retorno.split("-");
 
         TesteEntity entidade = new TesteEntity();
 
-        entidade.setDescricao(splited[0]);
-        entidade.setId(Integer.parseInt(splited[1]));
+        entidade.setDescricao("Alan Oliveira");
+        entidade.setId(1);
 
         return entidade;
     }
