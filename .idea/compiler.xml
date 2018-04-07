@@ -9,5 +9,8 @@
         <module name="doc_api" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="doc_api" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>
