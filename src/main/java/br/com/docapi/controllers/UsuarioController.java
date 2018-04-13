@@ -61,5 +61,20 @@ public class UsuarioController {
         return new ResultadoOperacaoAPI("Deletado com sucesso",true);
     }
 
+    @RequestMapping(value = "/logar", method = RequestMethod.POST, produces = "application/json; charset=UTF-8")
+    @ResponseBody
+    public ResponseEntity<UsuarioEntity> logar(@RequestBody UsuarioEntity usuario) throws Exception{
+
+        UsuarioEntity user = new UsuarioEntity();
+
+        try{
+            user = usuarioModel.logar(usuario);
+        }catch (Exception e){
+            return new ResponseEntity<UsuarioEntity>(user, HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<UsuarioEntity>(user, HttpStatus.OK);
+
+    }
+
 
 }

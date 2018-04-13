@@ -102,4 +102,35 @@ public class UsuarioDAO {
 
     }
 
+    public UsuarioEntity logar(UsuarioEntity usuario){
+
+        UsuarioEntity user = new UsuarioEntity();
+
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try{
+            conn = ConnectionFactory.obtemConexao();
+            String sql = "select idUsuarios, usuario, dataInsercao, gerenciaProjetos from usuarios where usuario = ? and senha = md5(?);";
+            ps = conn.prepareStatement (sql);
+            ps.setString(1,usuario.getUsuario());
+            ps.setString(2, usuario.getSenha());
+            ps.execute();
+
+            ResultSet rs = ps.getResultSet();
+
+            if(rs.next()){
+                user.setIdUsuario(rs.getInt(1));
+                user.setUsuario(rs.getString(2));
+                user.setDataInsercao(rs.getString(3));
+                user.setGerenciaProjetos(rs.getInt(4));
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+
+
+
+        return user;
+    }
+
 }

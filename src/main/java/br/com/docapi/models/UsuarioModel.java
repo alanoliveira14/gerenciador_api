@@ -25,4 +25,8 @@ public class UsuarioModel {
 
     }
 
+    public UsuarioEntity logar(UsuarioEntity usuario){
+        return usuarioDAO.logar(usuario);
+    }
+
 }
