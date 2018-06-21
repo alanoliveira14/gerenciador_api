@@ -4,7 +4,6 @@ import br.com.docapi.entity.ClienteEntity;
 import br.com.docapi.dao.ClienteDAO;
 import br.com.docapi.database.ConnectionFactory;
 
-import com.sun.org.apache.xpath.internal.operations.String;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

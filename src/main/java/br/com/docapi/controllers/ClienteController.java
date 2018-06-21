@@ -3,7 +3,6 @@ package br.com.docapi.controllers;
 import br.com.docapi.ResultadoOperacaoAPI;
 import br.com.docapi.entity.ClienteEntity;
 import br.com.docapi.models.ClienteModel;
-import com.sun.org.apache.xpath.internal.operations.String;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
