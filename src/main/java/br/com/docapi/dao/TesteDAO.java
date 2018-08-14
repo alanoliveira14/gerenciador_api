@@ -7,37 +7,30 @@ import java.sql.*;
 @Component
 public class TesteDAO {
     public String listar(){
-        Connection conn = null;
-        PreparedStatement ps = null;
+
         String retorno = "";
         String nome = null;
         Integer id = 0;
+        String sql = "select * from teste limit 1;";
 
-        try{
-            conn = ConnectionFactory.obtemConexao();
-            String sql = "select * from teste limit 1;";
-            ps = conn.prepareStatement (sql);
+        try(Connection conn = ConnectionFactory.obtemConexao();
+            PreparedStatement ps = conn.prepareStatement (sql);
+        ){
+
+
             ps.execute();
 
-            ResultSet rs = ps.getResultSet();
+            try(ResultSet rs = ps.getResultSet();) {
 
-            if(rs.next()){
-                nome = rs.getString(2);
-                id = rs.getInt(1);
-                retorno = nome +"-"+ id;
+                if (rs.next()) {
+                    nome = rs.getString(2);
+                    id = rs.getInt(1);
+                    retorno = nome + "-" + id;
+                }
             }
 
         }catch (SQLException e){
             e.printStackTrace();
-        }
-        finally{
-            try{
-                ps.close();
-                conn.close();
-            }
-            catch (SQLException e){
-                e.printStackTrace();
-            }
         }
         return retorno;
     }

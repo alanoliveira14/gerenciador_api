@@ -17,13 +17,11 @@ public class ProjetoDAO {
 
     public void inserirProjeto(ProjetoEntity projeto) {
 
-        Connection conn = null;
-        PreparedStatement ps = null;
+        String sql = "insert into projetos(titulo, descricao, fkIdGerente, finalidade, fkIdCliente) values(?,?,?,?,?);";
 
-        try{
-            conn = ConnectionFactory.obtemConexao();
-            String sql = "insert into projetos(titulo, descricao, fkIdGerente, finalidade, fkIdCliente) values(?,?,?,?,?);";
-            ps = conn.prepareStatement (sql);
+        try(Connection conn = ConnectionFactory.obtemConexao();
+            PreparedStatement ps = conn.prepareStatement (sql);
+        ){
             ps.setString(1, projeto.getTitulo());
             ps.setString(2, projeto.getDescricao());
             ps.setInt(3,    projeto.getIdGerente());
@@ -35,16 +33,6 @@ public class ProjetoDAO {
         }catch (SQLException e){
             e.printStackTrace();
         }
-        finally{
-            try{
-                ps.close();
-                conn.close();
-            }
-            catch (SQLException e){
-                e.printStackTrace();
-            }
-        }
-
 
     }
 
@@ -52,28 +40,30 @@ public class ProjetoDAO {
 
         List<ProjetoEntity> projetos = new ArrayList<ProjetoEntity>();
 
-        Connection conn = null;
-        PreparedStatement ps = null;
-        try {
-            conn = ConnectionFactory.obtemConexao();
-            String sql = "select p.idprojetos, p.titulo, p.descricao, p.fkIdGerente, col.nome, p.finalidade, p.fkIdCliente, cli.nome from projetos p, cliente cli, colaboradores col where p.fkIdCliente = cli.idcliente and p.fkIdGerente = col.idcolaboradores;";
-            ps = conn.prepareStatement(sql);
+        String sql = "select p.idprojetos, p.titulo, p.descricao, p.fkIdGerente, col.nome, p.finalidade, p.fkIdCliente, cli.nome from projetos p, cliente cli, colaboradores col where p.fkIdCliente = cli.idcliente and p.fkIdGerente = col.idcolaboradores;";
+
+        try (Connection conn = ConnectionFactory.obtemConexao();
+             PreparedStatement ps = conn.prepareStatement(sql);
+        ){
+
             ps.execute();
 
-            ResultSet rs = ps.getResultSet();
+            try(ResultSet rs = ps.getResultSet();){
 
-            while (rs.next()) {
-                ProjetoEntity projeto = new ProjetoEntity();
-                projeto.setIdProjeto(rs.getInt(1));
-                projeto.setTitulo(rs.getString(2));
-                projeto.setDescricao(rs.getString(3));
-                projeto.setIdGerente(rs.getInt(4));
-                projeto.setNomeGerente(rs.getString(5));
-                projeto.setFinalidade(rs.getString(6));
-                projeto.setIdCliente(rs.getInt(7));
-                projeto.setNomeCliente(rs.getString(8));
+                while (rs.next()) {
+                    ProjetoEntity projeto = new ProjetoEntity();
+                    projeto.setIdProjeto(rs.getInt(1));
+                    projeto.setTitulo(rs.getString(2));
+                    projeto.setDescricao(rs.getString(3));
+                    projeto.setIdGerente(rs.getInt(4));
+                    projeto.setNomeGerente(rs.getString(5));
+                    projeto.setFinalidade(rs.getString(6));
+                    projeto.setIdCliente(rs.getInt(7));
+                    projeto.setNomeCliente(rs.getString(8));
 
-                projetos.add(projeto);
+                    projetos.add(projeto);
+                }
+
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -83,27 +73,19 @@ public class ProjetoDAO {
 
     public void deletaProjeto(Integer idProjeto) {
 
-        Connection conn = null;
-        PreparedStatement ps = null;
+        String sql = "delete from projetos where idprojetos = ?";
 
-        try {
-            conn = ConnectionFactory.obtemConexao();
-            String sql = "delete from projetos where idprojetos = ?";
-            ps = conn.prepareStatement(sql);
+        try(Connection conn = ConnectionFactory.obtemConexao();
+            PreparedStatement ps = conn.prepareStatement(sql);
+        ){
+
+
             ps.setInt(1, idProjeto);
             ps.execute();
 
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                ps.close();
-                conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
         }
-
     }
 
     public void alterarProjeto(ProjetoEntity cliente) {
@@ -115,28 +97,28 @@ public class ProjetoDAO {
     public ProjetoEntity buscarProjeto(String tituloProjeto) {
 
         ProjetoEntity projeto = new ProjetoEntity();
-        Connection conn = null;
-        PreparedStatement ps = null;
-        try {
-            conn = ConnectionFactory.obtemConexao();
-            String sql = "select p.idprojetos, p.titulo, p.descricao, p.fkIdGerente, col.nome, p.finalidade, p.fkIdCliente, cli.nome from projetos p, cliente cli, colaboradores col where p.fkIdCliente = cli.idcliente and p.fkIdGerente = col.idcolaboradores and p.titulo = ?";
-            ps = conn.prepareStatement(sql);
+        String sql = "select p.idprojetos, p.titulo, p.descricao, p.fkIdGerente, col.nome, p.finalidade, p.fkIdCliente, cli.nome from projetos p, cliente cli, colaboradores col where p.fkIdCliente = cli.idcliente and p.fkIdGerente = col.idcolaboradores and p.titulo = ?";
+
+        try(Connection conn = ConnectionFactory.obtemConexao();
+            PreparedStatement ps = conn.prepareStatement(sql);
+        ){
+
             ps.setString(1, tituloProjeto);
             ps.execute();
+            try(ResultSet rs = ps.getResultSet();){
 
-            ResultSet rs = ps.getResultSet();
+                if (rs.next()) {
 
-            if (rs.next()) {
+                    projeto.setIdProjeto(rs.getInt(1));
+                    projeto.setTitulo(rs.getString(2));
+                    projeto.setDescricao(rs.getString(3));
+                    projeto.setIdGerente(rs.getInt(4));
+                    projeto.setNomeGerente(rs.getString(5));
+                    projeto.setFinalidade(rs.getString(6));
+                    projeto.setIdCliente(rs.getInt(7));
+                    projeto.setNomeCliente(rs.getString(8));
 
-                projeto.setIdProjeto(rs.getInt(1));
-                projeto.setTitulo(rs.getString(2));
-                projeto.setDescricao(rs.getString(3));
-                projeto.setIdGerente(rs.getInt(4));
-                projeto.setNomeGerente(rs.getString(5));
-                projeto.setFinalidade(rs.getString(6));
-                projeto.setIdCliente(rs.getInt(7));
-                projeto.setNomeCliente(rs.getString(8));
-
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();

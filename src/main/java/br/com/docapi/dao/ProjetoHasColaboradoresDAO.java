@@ -11,13 +11,14 @@ public class ProjetoHasColaboradoresDAO {
 
     public void inserirColab_Projeto(ProjetoHasColaboradoresEntity projetoColab) {
 
-        Connection conn = null;
-        PreparedStatement ps = null;
 
-        try{
-            conn = ConnectionFactory.obtemConexao();
-            String sql = "insert into projeto_has_colaboradores(fkIdColaborador, fkIdProjeto) values(?,?);";
-            ps = conn.prepareStatement (sql);
+        String sql = "insert into projeto_has_colaboradores(fkIdColaborador, fkIdProjeto) values(?,?);";
+
+        try(Connection conn = ConnectionFactory.obtemConexao();
+            PreparedStatement ps = conn.prepareStatement (sql);
+        ){
+
+
             ps.setInt(1, projetoColab.getIdColaborador());
             ps.setInt(2, projetoColab.getIdProjeto());
 
@@ -26,15 +27,6 @@ public class ProjetoHasColaboradoresDAO {
 
         }catch (SQLException e){
             e.printStackTrace();
-        }
-        finally{
-            try{
-                ps.close();
-                conn.close();
-            }
-            catch (SQLException e){
-                e.printStackTrace();
-            }
         }
 
 

@@ -16,13 +16,12 @@ public class UsuarioDAO {
 
     public void inserirUsuario(UsuarioEntity usuario){
 
-        Connection conn = null;
-        PreparedStatement ps = null;
+        String sql = "insert into usuarios (usuario, senha, ativo, fkIdColaborador, dataInsercao, gerenciaProjetos) values (?, md5(?), 1, ?, now(), ?);";
 
-        try{
-            conn = ConnectionFactory.obtemConexao();
-            String sql = "insert into usuarios (usuario, senha, ativo, fkIdColaborador, dataInsercao, gerenciaProjetos) values (?, md5(?), 1, ?, now(), ?);";
-            ps = conn.prepareStatement (sql);
+        try(
+                Connection conn = ConnectionFactory.obtemConexao();
+                PreparedStatement ps = conn.prepareStatement (sql);
+        ){
             ps.setString(1, usuario.getUsuario());
             ps.setString(2, usuario.getSenha());
             ps.setInt(3, usuario.getIdColaborador());
@@ -32,42 +31,32 @@ public class UsuarioDAO {
         }catch (SQLException e){
             e.printStackTrace();
         }
-        finally{
-            try{
-                ps.close();
-                conn.close();
-            }
-            catch (SQLException e){
-                e.printStackTrace();
-            }
-        }
-
 
     }
 
     public List<UsuarioEntity> listarUsuarios(){
 
-        Connection conn = null;
-        PreparedStatement ps = null;
+        String sql = "select idUsuarios, usuario, dataInsercao, gerenciaProjetos from usuarios;";
 
         List<UsuarioEntity> usuarios = new ArrayList<UsuarioEntity>();
-        try{
-            conn = ConnectionFactory.obtemConexao();
-            String sql = "select idUsuarios, usuario, dataInsercao, gerenciaProjetos from usuarios;";
-            ps = conn.prepareStatement (sql);
+        try(
+            Connection conn = ConnectionFactory.obtemConexao();
+            PreparedStatement ps = conn.prepareStatement (sql);
+        ){
             ps.execute();
 
-            ResultSet rs = ps.getResultSet();
+            try(ResultSet rs = ps.getResultSet();) {
 
-            while(rs.next()){
-                UsuarioEntity usuario = new UsuarioEntity();
+                while (rs.next()) {
+                    UsuarioEntity usuario = new UsuarioEntity();
 
-                usuario.setIdUsuario(rs.getInt(1));
-                usuario.setUsuario(rs.getString(2));
-                usuario.setDataInsercao(rs.getString(3));
-                usuario.setGerenciaProjetos(rs.getInt(4));
+                    usuario.setIdUsuario(rs.getInt(1));
+                    usuario.setUsuario(rs.getString(2));
+                    usuario.setDataInsercao(rs.getString(3));
+                    usuario.setGerenciaProjetos(rs.getInt(4));
 
-                usuarios.add(usuario);
+                    usuarios.add(usuario);
+                }
             }
         } catch (SQLException e){
             e.printStackTrace();
@@ -77,27 +66,19 @@ public class UsuarioDAO {
 
     public void deletarUsuario(Integer idUsuario){
 
-        Connection conn = null;
-        PreparedStatement ps = null;
+        String sql = "delete from usuarios where idUsuarios = ?";
 
-        try{
-            conn = ConnectionFactory.obtemConexao();
-            String sql = "delete from usuarios where idUsuarios = ?";
-            ps = conn.prepareStatement (sql);
+        try(
+            Connection conn = ConnectionFactory.obtemConexao();
+            PreparedStatement ps = conn.prepareStatement (sql);
+        ){
+
+
             ps.setInt(1, idUsuario);
             ps.execute();
 
         }catch (SQLException e){
             e.printStackTrace();
-        }
-        finally{
-            try{
-                ps.close();
-                conn.close();
-            }
-            catch (SQLException e){
-                e.printStackTrace();
-            }
         }
 
     }
@@ -105,24 +86,24 @@ public class UsuarioDAO {
     public UsuarioEntity logar(UsuarioEntity usuario){
 
         UsuarioEntity user = new UsuarioEntity();
+        String sql = "select idUsuarios, usuario, dataInsercao, gerenciaProjetos from usuarios where usuario = ? and senha = md5(?);";
 
-        Connection conn = null;
-        PreparedStatement ps = null;
-        try{
-            conn = ConnectionFactory.obtemConexao();
-            String sql = "select idUsuarios, usuario, dataInsercao, gerenciaProjetos from usuarios where usuario = ? and senha = md5(?);";
-            ps = conn.prepareStatement (sql);
+        try(
+            Connection conn = ConnectionFactory.obtemConexao();
+            PreparedStatement ps = conn.prepareStatement (sql);
+        ){
             ps.setString(1,usuario.getUsuario());
             ps.setString(2, usuario.getSenha());
             ps.execute();
 
-            ResultSet rs = ps.getResultSet();
+            try(ResultSet rs = ps.getResultSet();) {
 
-            if(rs.next()){
-                user.setIdUsuario(rs.getInt(1));
-                user.setUsuario(rs.getString(2));
-                user.setDataInsercao(rs.getString(3));
-                user.setGerenciaProjetos(rs.getInt(4));
+                if (rs.next()) {
+                    user.setIdUsuario(rs.getInt(1));
+                    user.setUsuario(rs.getString(2));
+                    user.setDataInsercao(rs.getString(3));
+                    user.setGerenciaProjetos(rs.getInt(4));
+                }
             }
         } catch (SQLException e){
             e.printStackTrace();

@@ -16,13 +16,12 @@ public class TarefaDAO {
 
     public void inserirTarefa(TarefaEntity tarefa){
 
-        Connection conn = null;
-        PreparedStatement ps = null;
+        String sql = "insert into tarefas(descricao,dataInicio, dataPrevista, situacao, fkIdProjeto,fkIdColaborador) values(?,?,?,?,?,?);";
 
-        try{
-            conn = ConnectionFactory.obtemConexao();
-            String sql = "insert into tarefas(descricao,dataInicio, dataPrevista, situacao, fkIdProjeto,fkIdColaborador) values(?,?,?,?,?,?);";
-            ps = conn.prepareStatement (sql);
+        try(
+                Connection conn = ConnectionFactory.obtemConexao();
+                PreparedStatement ps = conn.prepareStatement (sql);
+        ){
             ps.setString(1, tarefa.getDescricao());
             ps.setString(2, tarefa.getDataInicio());
             ps.setString(3, tarefa.getDataPrevista());
@@ -34,27 +33,19 @@ public class TarefaDAO {
         }catch (SQLException e){
             e.printStackTrace();
         }
-        finally{
-            try{
-                ps.close();
-                conn.close();
-            }
-            catch (SQLException e){
-                e.printStackTrace();
-            }
-        }
-
     }
     public void alterarTarefa(TarefaEntity tarefa){
 
-        Connection conn = null;
-        PreparedStatement ps = null;
         if (tarefa.getDataFinalizacao() == null){
 
-            try{
-                conn = ConnectionFactory.obtemConexao();
-                String sql = "update tarefas set situacao = ?, fkIdColaborador = ? where idTarefas = ?;";
-                ps = conn.prepareStatement (sql);
+            String sql = "update tarefas set situacao = ?, fkIdColaborador = ? where idTarefas = ?;";
+
+            try(
+                    Connection conn = ConnectionFactory.obtemConexao();
+                    PreparedStatement ps = conn.prepareStatement (sql);
+            ){
+
+
                 ps.setString(1, tarefa.getSituacao());
                 ps.setInt(2, tarefa.getFkIdColaborador());
                 ps.setInt(3, tarefa.getIdTarefas());
@@ -63,20 +54,12 @@ public class TarefaDAO {
             }catch (SQLException e){
                 e.printStackTrace();
             }
-            finally{
-                try{
-                    ps.close();
-                    conn.close();
-                }
-                catch (SQLException e){
-                    e.printStackTrace();
-                }
-            }
         }else{
-            try{
-                conn = ConnectionFactory.obtemConexao();
-                String sql = "update tarefas set situacao = ?,  fkIdColaborador = ?, dataFinalizacao = ? where idTarefas = ?;";
-                ps = conn.prepareStatement (sql);
+            String sql = "update tarefas set situacao = ?,  fkIdColaborador = ?, dataFinalizacao = ? where idTarefas = ?;";
+            try(
+                Connection conn = ConnectionFactory.obtemConexao();
+                PreparedStatement ps = conn.prepareStatement (sql);
+            ){
                 ps.setString(1, tarefa.getSituacao());
                 ps.setInt(2, tarefa.getFkIdColaborador());
                 ps.setString(3, tarefa.getDataFinalizacao());
@@ -86,42 +69,35 @@ public class TarefaDAO {
             }catch (SQLException e){
                 e.printStackTrace();
             }
-            finally{
-                try{
-                    ps.close();
-                    conn.close();
-                }
-                catch (SQLException e){
-                    e.printStackTrace();
-                }
-            }
         }
     }
     public List<TarefaEntity> listarTarefas() {
 
         List<TarefaEntity> tarefas = new ArrayList<TarefaEntity>();
 
-        Connection conn = null;
-        PreparedStatement ps = null;
-        try {
-            conn = ConnectionFactory.obtemConexao();
-            String sql = "select tarefas.*, c.nome, p.titulo from tarefas inner join colaboradores as c inner join projetos as p where c.idcolaboradores = tarefas.fkIdColaborador and p.idprojetos = tarefas.fkIdProjeto;;";
-            ps = conn.prepareStatement(sql);
+        String sql = "select tarefas.*, c.nome, p.titulo from tarefas inner join colaboradores as c inner join projetos as p where c.idcolaboradores = tarefas.fkIdColaborador and p.idprojetos = tarefas.fkIdProjeto;;";
+
+        try(Connection conn = ConnectionFactory.obtemConexao();
+            PreparedStatement ps = conn.prepareStatement(sql);
+        ){
+
+
             ps.execute();
 
-            ResultSet rs = ps.getResultSet();
+            try(ResultSet rs = ps.getResultSet();){
 
-            while (rs.next()) {
-                TarefaEntity tarefa = new TarefaEntity();
-                tarefa.setIdTarefas(rs.getInt(1));
-                tarefa.setDescricao(rs.getString(2));
-                tarefa.setDataInicio(rs.getString(3));
-                tarefa.setDataPrevista(rs.getString(4));
-                tarefa.setDataFinalizacao(rs.getString(5));
-                tarefa.setSituacao(rs.getString(6));
-                tarefa.setNomeColaborador(rs.getString(9));
-                tarefa.setNomeProjeto(rs.getString(10));
-                tarefas.add(tarefa);
+                while (rs.next()) {
+                    TarefaEntity tarefa = new TarefaEntity();
+                    tarefa.setIdTarefas(rs.getInt(1));
+                    tarefa.setDescricao(rs.getString(2));
+                    tarefa.setDataInicio(rs.getString(3));
+                    tarefa.setDataPrevista(rs.getString(4));
+                    tarefa.setDataFinalizacao(rs.getString(5));
+                    tarefa.setSituacao(rs.getString(6));
+                    tarefa.setNomeColaborador(rs.getString(9));
+                    tarefa.setNomeProjeto(rs.getString(10));
+                    tarefas.add(tarefa);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();

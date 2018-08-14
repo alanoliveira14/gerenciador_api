@@ -16,13 +16,11 @@ public class ClienteDAO {
 
     public void inserirCliente(ClienteEntity cliente){
 
-        Connection conn = null;
-        PreparedStatement ps = null;
+        String sql = "insert into cliente(nome, cnpj) values(?,?);";
 
-        try{
-            conn = ConnectionFactory.obtemConexao();
-            String sql = "insert into cliente(nome, cnpj) values(?,?);";
-            ps = conn.prepareStatement (sql);
+        try(Connection conn = ConnectionFactory.obtemConexao();
+            PreparedStatement ps = conn.prepareStatement (sql);
+        ){
             ps.setString(1, cliente.getNome());
             ps.setString(2, cliente.getCnpj());
             ps.execute();
@@ -30,16 +28,6 @@ public class ClienteDAO {
         }catch (SQLException e){
             e.printStackTrace();
         }
-        finally{
-            try{
-                ps.close();
-                conn.close();
-            }
-            catch (SQLException e){
-                e.printStackTrace();
-            }
-        }
-
     }
 
     public List<ClienteEntity> listarClientes(){
@@ -48,13 +36,13 @@ public class ClienteDAO {
 
         Connection conn = null;
         PreparedStatement ps = null;
+        ResultSet rs = null;
         try{
             conn = ConnectionFactory.obtemConexao();
             String sql = "select * from cliente;";
             ps = conn.prepareStatement (sql);
             ps.execute();
-
-            ResultSet rs = ps.getResultSet();
+            rs = ps.getResultSet();
 
             while(rs.next()){
                 ClienteEntity cliente = new ClienteEntity();
@@ -66,46 +54,54 @@ public class ClienteDAO {
             }
         } catch (SQLException e){
             e.printStackTrace();
+        }finally {
+            if(conn != null){
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }if(ps != null){
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }if(rs != null){
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return clientes;
     }
 
     public void deletaCliente(Integer idCliente){
 
-        Connection conn = null;
-        PreparedStatement ps = null;
+        String sql = "delete from cliente where idcliente = ?";
 
-        try{
-            conn = ConnectionFactory.obtemConexao();
-            String sql = "delete from cliente where idcliente = ?";
-            ps = conn.prepareStatement (sql);
+
+        try(Connection conn = ConnectionFactory.obtemConexao();
+            PreparedStatement ps = conn.prepareStatement (sql);
+        ){
             ps.setInt(1, idCliente);
             ps.execute();
-
         }catch (SQLException e){
             e.printStackTrace();
         }
-        finally{
-            try{
-                ps.close();
-                conn.close();
-            }
-            catch (SQLException e){
-                e.printStackTrace();
-            }
-        }
-
     }
 
     public void alterarCliente(ClienteEntity cliente){
 
-        Connection conn = null;
-        PreparedStatement ps = null;
+        String sql = "update cliente set nome = ? where idcliente = ?";
 
-        try{
-            conn = ConnectionFactory.obtemConexao();
-            String sql = "update cliente set nome = ? where idcliente = ?";
-            ps = conn.prepareStatement (sql);
+        try(Connection conn = ConnectionFactory.obtemConexao();
+            PreparedStatement ps = conn.prepareStatement (sql);
+        ){
+
+
             ps.setString(1, cliente.getNome());
             ps.setInt(2, cliente.getIdCliente());
             ps.execute();
@@ -113,39 +109,29 @@ public class ClienteDAO {
         }catch (SQLException e){
             e.printStackTrace();
         }
-        finally{
-            try{
-                ps.close();
-                conn.close();
-            }
-            catch (SQLException e){
-                e.printStackTrace();
-            }
-        }
-
     }
 
     public ClienteEntity buscarCliente(String cnpjCliente){
 
         ClienteEntity cliente = new ClienteEntity();
-        Connection conn = null;
-        PreparedStatement ps = null;
-        try{
-            conn = ConnectionFactory.obtemConexao();
-            String sql = "select * from cliente where cnpj = ?";
-            ps = conn.prepareStatement (sql);
+        String sql = "select * from cliente where cnpj = ?";
+
+        try(Connection  conn = ConnectionFactory.obtemConexao();
+            PreparedStatement ps = conn.prepareStatement (sql);
+        ){
             ps.setString(1, cnpjCliente);
             ps.execute();
 
-            ResultSet rs = ps.getResultSet();
+            try(ResultSet rs = ps.getResultSet();){
+                if(rs.next()){
 
-            if(rs.next()){
+                    cliente.setIdCliente(rs.getInt(1));
+                    cliente.setNome(rs.getString(2));
+                    cliente.setCnpj(rs.getString(3));
 
-                cliente.setIdCliente(rs.getInt(1));
-                cliente.setNome(rs.getString(2));
-                cliente.setCnpj(rs.getString(3));
-
+                }
             }
+
         } catch (SQLException e){
             e.printStackTrace();
         }
